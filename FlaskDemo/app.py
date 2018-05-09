@@ -47,7 +47,7 @@ def user():
     return render_template('user.html')
 
 
-# 不存在页面报错
+# 不存在页面报错截获
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404
