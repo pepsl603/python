@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <form action="/search_post" method="post">
+        {% csrf_token %}
+        <input type="text" name="q">
+        <input type="submit" name="Submit">
+    </form>
+
+    <p>查找的是：{{ rlt }}</p>
+    {% for item in testlist %}
+        <li>账号名称：{{ item.name }},注册时间：{{ item.recdate | date:"Y-m-d H:i:s" }}</li>
+    {% endfor %}
+</body>
+</html>

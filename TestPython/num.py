@@ -1,0 +1,8 @@
+num1 = input('请输入第一个数字：')
+num1 = int(num1)
+num2 = input('请输入第二个数字：')
+num2 = int(num2)
+print("{} + {} = {}".format(num1,num2,num1+num2))
+print("{} - {} = {}".format(num1,num2,num1-num2))
+print("{} * {} = {}".format(num1,num2,num1*num2))
+print("{} / {} = {}".format(num1,num2,num1/num2))

@@ -1,0 +1,8 @@
+
+{% extends "base.html" %}
+{% block mainbody %}
+    <h2>现在的时间是：{{ tdt }}</h2>
+    {% for item in testlist %}
+        <li>账号名称：{{ item.name }},注册时间：{{ item.recdate | date:"Y-m-d H:i:s" }}</li>
+    {% endfor %}
+{% endblock %}

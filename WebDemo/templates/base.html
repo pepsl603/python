@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    {# 标题 #}
+    <title>{{ title }}</title>
+</head>
+<body>
+    <h1>{{ hello }}</h1>
+    {% block mainbody %}
+        <h2>现在的时间是：{{ dt }}</h2>
+    {% endblock %}
+</body>
+</html>
