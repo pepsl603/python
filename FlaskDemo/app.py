@@ -1,8 +1,13 @@
 from flask import Flask
 from flask import render_template
 # from flask import make_response
-from flask import redirect
+from flask import redirect, session, url_for, flash
 from flask_bootstrap import Bootstrap
+from flask_moment import Moment
+from datetime import datetime
+from flask_wtf import FlaskForm
+from wtforms import StringField, SubmitField, PasswordField
+from wtforms.validators import DataRequired, Email
 # from flask import abort
 # from flask_script import Manager, Server
 import config
@@ -10,16 +15,32 @@ import config
 app = Flask(__name__)  # type:Flask
 app.config.from_object(config)
 bootstrap = Bootstrap(app)
+moment = Moment(app)
 # manager = Manager(app)
 # manager.add_command("runserver 0.0.0.0 8001", Server(use_debugger=True))
 
 
+class NameForm(FlaskForm):
+    name = StringField('你的注册邮箱是？', validators=[DataRequired(), Email()])
+    psd = PasswordField('密码', validators=[DataRequired()])
+    submit = SubmitField('提交')
+
+
 # 起始页
-@app.route('/index/<name>')
-@app.route('/index/')
-@app.route('/')
-def start(name=''):
-    return render_template('index.html', name=name)
+# @app.route('/index/<name>')
+# @app.route('/index/')
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    name = None
+    form = NameForm()
+    if form.validate_on_submit():
+        old_name = session.get('name')
+        if old_name is not None and old_name != form.name.data:
+            flash('你切换了登录账户！')
+        session['name'] = form.name.data
+        form.name.data = ''
+        return redirect(url_for('index'))
+    return render_template('index.html', form=form, name=session.get('name'), currenttime=datetime.utcnow())
 
 
 # 首页

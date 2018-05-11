@@ -1,9 +1,22 @@
 {% extends "base.html" %}
 
-{% block title %}Flask Start Page{% endblock %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+
+{% block title %}测试平台{% endblock %}
 
 {% block page_content %}
     <div class="page-header">
-        <h1>Hello {{ name }}</h1>
+        <h1>你好 {% if name %}{{ name }}{% else %}匿名用户{% endif %}</h1>
+        <p>你打开页面的时间是 {{ moment(currenttime).format('LLL') }}</p>
+        <p>那是在{{ moment(currenttime).fromNow(refresh=True) }}</p>
+    </div>
+    <div class="container">
+{#        <form method="post">#}
+{#            {{ form.hidden_tag() }}#}
+{#            {{ form.name.label }}{{ form.name(id='my_text_field') }}#}
+{#            {{ form.submit() }}#}
+{#        </form>#}
+        {{ wtf.quick_form(form) }}
     </div>
 {% endblock %}
