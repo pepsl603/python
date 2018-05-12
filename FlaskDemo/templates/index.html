@@ -8,8 +8,13 @@
 {% block page_content %}
     <div class="page-header">
         <h1>你好 {% if name %}{{ name }}{% else %}匿名用户{% endif %}</h1>
-        <p>你打开页面的时间是 {{ moment(currenttime).format('LLL') }}</p>
-        <p>那是在{{ moment(currenttime).fromNow(refresh=True) }}</p>
+        {% if not known %}
+            <p>首次登录</p>
+        {% else %}
+            <p>很高兴再次见到你</p>
+        {% endif %}
+{#        <p>你打开页面的时间是 {{ moment(currenttime).format('LLL') }}</p>#}
+{#        <p>那是在{{ moment(currenttime).fromNow(refresh=True) }}</p>#}
     </div>
     <div class="container">
 {#        <form method="post">#}

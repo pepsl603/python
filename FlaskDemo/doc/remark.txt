@@ -35,3 +35,96 @@ MySQL mysql://username:password@hostname/database
 Postgres postgresql://username:password@hostname/database
 SQLite（ Unix） sqlite:////absolute/path/to/database
 SQLite（ Windows） sqlite:///c:/absolute/path/to/database
+Oracle oracle://scott:tiger@127.0.0.1:1521/sidname
+
+4,最常用的SQLAlchemy列类型
+Integer int 普通整数，一般是 32 位
+SmallInteger int 取值范围小的整数，一般是 16 位
+BigInteger int 或 long 不限制精度的整数
+Float float 浮点数
+Numeric decimal.Decimal 定点数
+String str 变长字符串
+Text str 变长字符串，对较长或不限长度的字符串做了优化
+Unicode unicode 变长 Unicode 字符串
+UnicodeText unicode 变长 Unicode 字符串，对较长或不限长度的字符串做了优化
+Boolean bool 布尔值
+Date datetime.date 日期
+Time datetime.time 时间
+DateTime datetime.datetime 日期和时间
+Interval datetime.timedelta 时间间隔
+Enum str 一组字符串
+PickleType 任何 Python 对象 自动使用 Pickle 序列化
+LargeBinary str 二进制文件
+
+最常使用的SQLAlchemy列选项
+primary_key 如果设为 True，这列就是表的主键
+unique 如果设为 True，这列不允许出现重复的值
+index 如果设为 True，为这列创建索引，提升查询效率
+nullable 如果设为 True，这列允许使用空值；如果设为 False，这列不允许使用空值
+default 为这列定义默认值
+
+5,常用的SQLAlchemy关系选项
+backref 在关系的另一个模型中添加反向引用
+primaryjoin 明确指定两个模型之间使用的联结条件。只在模棱两可的关系中需要指定
+lazy 指定如何加载相关记录。可选值有 select（首次访问时按需加载）、 immediate（源对象加
+载后就加载）、 joined（加载记录，但使用联结）、 subquery（立即加载，但使用子查询），
+noload（永不加载）和 dynamic（不加载记录，但提供加载记录的查询）
+uselist 如果设为 Fales，不使用列表，而使用标量值
+order_by 指定关系中记录的排序方式
+secondary 指定多对多关系中关系表的名字
+secondaryjoin SQLAlchemy 无法自行决定时，指定多对多关系中的二级联结条件
+
+6,Flask-SQLAlchemy 扩展能够识别的配置键的清单:
+SQLALCHEMY_DATABASE_URI	用于连接数据的数据库
+SQLALCHEMY_BINDS	一个映射绑定 (bind) 键到 SQLAlchemy 连接 URIs 的字典。 更多的信息请参阅 绑定多个数据库。
+SQLALCHEMY_ECHO	如果设置成 True，SQLAlchemy 将会记录所有 发到标准输出(stderr)的语句，这对调试很有帮助。
+SQLALCHEMY_RECORD_QUERIES	可以用于显式地禁用或者启用查询记录。查询记录 在调试或者测试模式下自动启用。更多信息请参阅 get_debug_queries()。
+SQLALCHEMY_NATIVE_UNICODE	可以用于显式地禁用支持原生的 unicode。这是 某些数据库适配器必须的（像在 Ubuntu 某些版本上的 PostgreSQL），当使用不合适的指定无编码的数据库 默认值时。
+SQLALCHEMY_POOL_SIZE	数据库连接池的大小。默认是数据库引擎的默认值 （通常是 5）。
+SQLALCHEMY_POOL_TIMEOUT	指定数据库连接池的超时时间。默认是 10。
+SQLALCHEMY_POOL_RECYCLE	自动回收连接的秒数。这对 MySQL 是必须的，默认 情况下 MySQL 会自动移除闲置 8 小时或者以上的连接。 需要注意地是如果使用 MySQL 的话， Flask-SQLAlchemy 会自动地设置这个值为 2 小时。
+SQLALCHEMY_MAX_OVERFLOW	控制在连接池达到最大值后可以创建的连接数。当这些额外的 连接回收到连接池后将会被断开和抛弃。
+SQLALCHEMY_TRACK_MODIFICATIONS	如果设置成 True (默认情况)，Flask-SQLAlchemy 将会追踪对象的修改并且发送信号。这需要额外的内存， 如果不必要的可以禁用它。
+
+
+7,数据库操作
+from app import db
+db.create_all()
+db.drop_all()
+
+8,常用的SQLAlchemy查询过滤器
+filter() 把过滤器添加到原查询上，返回一个新查询
+filter_by() 把等值过滤器添加到原查询上，返回一个新查询
+limit() 使用指定的值限制原查询返回的结果数量，返回一个新查询
+offset() 偏移原查询返回的结果，返回一个新查询
+order_by() 根据指定条件对原查询结果进行排序，返回一个新查询
+group_by() 根据指定条件对原查询结果进行分组，返回一个新查询
+
+9,最常使用的SQLAlchemy查询执行函数
+all() 以列表形式返回查询的所有结果
+first() 返回查询的第一个结果，如果没有结果，则返回 None
+first_or_404() 返回查询的第一个结果，如果没有结果，则终止请求，返回 404 错误响应
+get() 返回指定主键对应的行，如果没有对应的行，则返回 None
+get_or_404() 返回指定主键对应的行，如果没找到指定的主键，则终止请求，返回 404 错误响应
+count() 返回查询结果的数量
+paginate() 返回一个 Paginate 对象，它包含指定范围内的结果
+
+10,数据库迁移
+创建迁移仓库
+python app.py db init
+migrate 子命令用来自动创建迁移脚本：
+python app.py db migrate -m "initial migration"
+迁移完成后，更新到数据库
+python app.py db upgrade
+删除更新
+python app.py db downgrade
+
+
+11，Flask-Mail SMTP服务器的配置
+配置             默认值      说   　　明
+MAIL_SERVER     localhost   电子邮件服务器的主机名或 IP 地址
+MAIL_PORT       25          电子邮件服务器的端口
+MAIL_USE_TLS    False       启用传输层安全（ Transport Layer Security， TLS）协议
+MAIL_USE_SSL    False       启用安全套接层（ Secure Sockets Layer， SSL）协议
+MAIL_USERNAME   None        邮件账户的用户名
+MAIL_PASSWORD   None        邮件账户的密码
