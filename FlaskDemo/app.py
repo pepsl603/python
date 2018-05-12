@@ -55,9 +55,9 @@ mail = Mail(app)
 
 def send_async_email(app, msg):
     with app.app_context():
-        print(app.config['MAIL_USERNAME'])
-        print(app.config['MAIL_PASSWORD'])
-        print(app.config['H2D_MAIL_SENDER'])
+        # print(app.config['MAIL_USERNAME'])
+        # print(app.config['MAIL_PASSWORD'])
+        # print(app.config['H2D_MAIL_SENDER'])
         mail.send(msg)
 
 
