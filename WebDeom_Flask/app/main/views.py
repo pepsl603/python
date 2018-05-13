@@ -1,5 +1,5 @@
 from datetime import datetime
-from flask import render_template, session, redirect, url_for, flash
+from flask import render_template, session, redirect, url_for, flash, request
 
 from . import main
 from .forms import NameForm
@@ -22,7 +22,14 @@ def index():
         user = User.query.filter_by(username=form.name.data).first()
         if user is None:
             user = User(username=form.name.data, mail=form.mail.data, password=form.password.data)
-            db.session.add(user)
+            try:
+                db.session.add(user)
+                db.session.flush()
+            except Exception:
+                db.session.rollback()
+                print("add error ")
+                flash('注册失败')
+                return redirect(url_for('main.index'))
             session['known'] = False
             # 注册用户 发一封邮件
             if form.mail.data:
