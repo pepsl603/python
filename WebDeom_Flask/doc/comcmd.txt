@@ -1,0 +1,36 @@
+pip 可以使用如下命令自动生成这个文件
+pip freeze >requirements.txt
+
+如果你要创建这个虚拟环境的完全副本，可以创建一个新的虚拟环境，并在其上运行以下
+命令：
+(venv) $ pip install -r requirements.txt
+
+
+如果使用 Flask-Migrate 跟
+踪迁移，可使用如下命令创建数据表或者升级到最新修订版本：
+(venv) $ python manage.py db upgrade
+
+开库
+python manage.py shell
+from manage import db
+db.create_all()
+db.drop_all()
+
+数据库迁移
+创建迁移仓库
+python manage.py db init
+migrate 子命令用来自动创建迁移脚本：
+python manage.py db migrate -m "initial migration"
+迁移完成后，更新到数据库
+python manage.py db upgrade
+删除更新
+python manage.py db downgrade
+
+编译Python文件，生成.pyc文件，运行更快
+python -m xxx.py
+更优
+python -O -m xxx.py
+
+
+跑测试用例
+python manage.py test
