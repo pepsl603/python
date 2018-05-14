@@ -7,21 +7,28 @@
 
 {% block page_content %}
     <div class="page-header">
-        <h1>你好 {% if name %}{{ name }}{% else %}匿名用户{% endif %}</h1>
-        {% if not known %}
-            <p>首次登录</p>
+        {% if current_user.is_authenticated %}
+            <h1>你好,{{ current_user.username }}</h1>
+            <p>时间&nbsp;&nbsp;{{ moment(currenttime).format('LLL') }}</p>
         {% else %}
-            <p>很高兴再次见到你</p>
+            <h1>请点击右上角登录</h1>
         {% endif %}
-{#        <p>你打开页面的时间是 {{ moment(currenttime).format('LLL') }}</p>#}
+
+
+{#        {% if not known %}#}
+{#            <p>首次登录</p>#}
+{#        {% else %}#}
+{#            <p>很高兴再次见到你</p>#}
+{#        {% endif %}#}
+
 {#        <p>那是在{{ moment(currenttime).fromNow(refresh=True) }}</p>#}
     </div>
-    <div class="container">
+{#    <div class="container">#}
 {#        <form method="post">#}
 {#            {{ form.hidden_tag() }}#}
 {#            {{ form.name.label }}{{ form.name(id='my_text_field') }}#}
 {#            {{ form.submit() }}#}
 {#        </form>#}
-        {{ wtf.quick_form(form) }}
-    </div>
+{#        {{ wtf.quick_form(form) }}#}
+{#    </div>#}
 {% endblock %}

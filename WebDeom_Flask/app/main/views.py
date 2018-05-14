@@ -14,35 +14,35 @@ from ..email import send_email
 @main.route('/', methods=['GET', 'POST'])
 def index():
     # name = None
-    form = NameForm()
-    if form.validate_on_submit():
-        old_name = session.get('name')
-        if old_name is not None and old_name != form.name.data:
-            flash('你切换了登录账户！')
-        user = User.query.filter_by(username=form.name.data).first()
-        if user is None:
-            user = User(username=form.name.data, mail=form.mail.data, password=form.password.data)
-            try:
-                db.session.add(user)
-                db.session.flush()
-            except Exception:
-                db.session.rollback()
-                print("add error ")
-                flash('注册失败')
-                return redirect(url_for('main.index'))
-            session['known'] = False
-            # 注册用户 发一封邮件
-            if form.mail.data:
-                user.recdate = datetime.utcnow()
-                send_email(form.mail.data, '新用户注册', 'mail/new_user', user=user)
-        else:
-            session['known'] = True
-        session['name'] = form.name.data
-        form.name.data = ''
-        return redirect(url_for('main.index'))
-    return render_template('index.html', form=form, name=session.get('name'),
-                           known=session.get('known', False), currenttime=datetime.utcnow())
-
+    # form = NameForm()
+    # if form.validate_on_submit():
+    #     old_name = session.get('name')
+    #     if old_name is not None and old_name != form.name.data:
+    #         flash('你切换了登录账户！')
+    #     user = User.query.filter_by(username=form.name.data).first()
+    #     if user is None:
+    #         user = User(username=form.name.data, mail=form.mail.data, password=form.password.data)
+    #         try:
+    #             db.session.add(user)
+    #             db.session.flush()
+    #         except Exception:
+    #             db.session.rollback()
+    #             print("add error ")
+    #             flash('注册失败')
+    #             return redirect(url_for('main.index'))
+    #         session['known'] = False
+    #         # 注册用户 发一封邮件
+    #         if form.mail.data:
+    #             user.recdate = datetime.utcnow()
+    #             send_email(form.mail.data, '新用户注册', 'mail/new_user', user=user)
+    #     else:
+    #         session['known'] = True
+    #     session['name'] = form.name.data
+    #     form.name.data = ''
+    #     return redirect(url_for('main.index'))
+    # return render_template('index.html', form=form, name=session.get('name'),
+    #                        known=session.get('known', False), currenttime=datetime.utcnow())
+    return render_template('index.html', currenttime=datetime.utcnow())
 
 # 首页
 @main.route('/main/<name>/')
