@@ -1,0 +1,10 @@
+<p>会员 {{ user.username }},你好</p>
+<p>你在网站上执行了重置密码的操作， <a href="{{ url_for('auth.reset_psd', token=token, _external=True) }}">请点击此处开始重置</a>.</p>
+<p>或者复制以下链接地址，在浏览器中打开</p>
+<p>{{ url_for('auth.reset_psd', token=token, _external=True) }}</p>
+<p>本链接将在本次使用后自动失效，未验证1小时后也会失效。</p>
+<br>
+<p>如果您没有重置密码，而收到本邮件，那么很抱歉，可能有人填写了此邮件地址。请忽略或删除本邮件</p>
+<p>此致,</p>
+<p>H2D团队</p>
+<p><small>提示: 本邮件为自动发送，请勿回复。</small></p>

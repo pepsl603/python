@@ -6,15 +6,19 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 class Config:
     # 为了实现 CSRF 保护， Flask-WTF 需要程序设置一个密钥。 Flask-WTF 使用这个密钥生成
     # 加密令牌，再用令牌验证请求中表单数据的真伪
-    SECRET_KEY = os.environ.get('SECRET_KEY') or 'hard to guess string'
-    # 将会追踪对象的修改并且发送信号。这需要额外的内存
-    SQLALCHEMY_COMMIT_ON_TEARDOWN = True
+    SECRET_KEY = os.environ.get('SECRET_KEY') or 'hard to guess h2d string'
+    # SQLALCHEMY_COMMIT_ON_TEARDOWN = True
     SQLALCHEMY_TRACK_MODIFICATIONS = True
+    # 将会追踪对象的修改并且发送信号。这需要额外的内存
 
     # 邮箱
     H2D_MAIL_SUBJECT_PREFIX = '[H2D]'
     H2D_MAIL_SENDER = 'H2D Admin <product@hangar.cn>'
-    FLASKY_ADMIN = os.environ.get('FLASKY_ADMIN')
+    FLASKY_ADMIN = os.environ.get('FLASKY_ADMIN') or 'product@hangar.cn'
+
+    # bootstrap
+    # 使用本地的Bootstrap资源
+    # BOOTSTRAP_SERVE_LOCAL = True
 
     @staticmethod
     def init_app(app):

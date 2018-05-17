@@ -1,0 +1,13 @@
+你好 {{ user.username }},
+
+欢迎注册为H2D会员
+
+为了完成注册，正常登录H2D网站，请点击下面链接:
+
+{{ url_for('auth.confirm', token=token, _external=True) }}
+
+此致,
+
+H2D团队
+
+提示: 本邮件为自动发送，请勿回复。

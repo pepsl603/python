@@ -10,5 +10,8 @@
     </div>
     <div class="container col-md-4">
         {{ wtf.quick_form(form) }}
+        <br>
+        <p>忘记密码？<a href="{{ url_for('auth.reset_psd_queuest') }}">点击重置</a></p>
+        <p>新用户？<a href="{{ url_for('auth.register') }}">点此注册</a></p>
     </div>
 {% endblock %}

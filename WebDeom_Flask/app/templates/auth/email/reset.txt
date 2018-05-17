@@ -1,0 +1,11 @@
+你好 {{ user.username }},
+
+你在网站上点击了重置密码，请点击下面链接开始重置:
+
+{{ url_for('auth.reset_psd', token=token, _external=True) }}
+
+此致,,
+
+H2D团队
+
+提示: 本邮件为自动发送，请勿回复。

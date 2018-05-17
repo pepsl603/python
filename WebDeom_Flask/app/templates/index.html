@@ -9,6 +9,8 @@
     <div class="page-header">
         {% if current_user.is_authenticated %}
             <h1>你好,{{ current_user.username }}</h1>
+            <br>
+            <p>欢迎登录H2D官方网站</p>
             <p>时间&nbsp;&nbsp;{{ moment(currenttime).format('LLL') }}</p>
         {% else %}
             <h1>请点击右上角登录</h1>

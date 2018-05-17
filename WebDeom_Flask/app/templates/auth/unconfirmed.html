@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}H2D-验证账号{% endblock %}
+
+{% block page_content %}
+    <h1>你好,{{ current_user.username }}</h1>
+    <h3>你还没有验证你的账号</h3>
+    <br>
+    <p>
+        你需要先在注册邮箱中，验证你的账号。通过后，才能正常使用。<br>
+        请登录你的注册邮箱，查看是否收到验证邮件。
+    </p>
+    <p>
+        需要重新发送验证邮件？<a href="{{ url_for('auth.resend_confirmation') }}">请点击此处</a>
+    </p>
+{% endblock %}

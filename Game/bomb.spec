@@ -3,7 +3,7 @@
 block_cipher = None
 
 
-a = Analysis(['C:\\CODE\\PYTHON\\Game\\bomb.py'],
+a = Analysis(['bomb.py'],
              pathex=['C:\\CODE\\PYTHON\\Game'],
              binaries=[],
              datas=[],

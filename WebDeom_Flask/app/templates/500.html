@@ -6,6 +6,6 @@
 
 {% block page_content %}
     <div class="page-header">
-        <h1>Page Error! Please contact the admin</h1>
+        <h1>出错了，请联系管理员 {{ current_app.config['SECRET_KEY'] }}</h1>
     </div>
 {% endblock %}

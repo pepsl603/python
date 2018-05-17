@@ -11,20 +11,20 @@ missing module named multiprocessing.current_process - imported by multiprocessi
 missing module named 'win32com.gen_py' - imported by win32com, c:\users\administrator\appdata\local\programs\python\python36\lib\site-packages\PyInstaller\loader\rthooks\pyi_rth_win32comgenpy.py
 missing module named pyimod03_importers - imported by c:\users\administrator\appdata\local\programs\python\python36\lib\site-packages\PyInstaller\loader\rthooks\pyi_rth_pkgres.py
 missing module named 'pkg_resources.extern.pyparsing' - imported by pkg_resources._vendor.packaging.markers, pkg_resources._vendor.packaging.requirements
-missing module named StringIO - imported by numpy.lib.utils, numpy.testing.nose_tools.utils, scipy._lib.six, numpy.lib.format, pkg_resources._vendor.six
 missing module named __builtin__ - imported by numpy.core.numerictypes, numpy.core.numeric, scipy._lib.six, numpy.distutils.misc_util, numpy.lib.function_base, numpy.lib._iotools, numpy.ma.core, numpy, pkg_resources._vendor.pyparsing
 missing module named ordereddict - imported by pkg_resources._vendor.pyparsing
+missing module named StringIO - imported by numpy.lib.utils, numpy.testing.nose_tools.utils, scipy._lib.six, numpy.lib.format, pkg_resources._vendor.six
 missing module named 'com.sun' - imported by pkg_resources._vendor.appdirs
 missing module named com - imported by pkg_resources._vendor.appdirs
 missing module named __main__ - imported by pkg_resources
-missing module named pkg_resources.extern.packaging - imported by pkg_resources.extern, pkg_resources, setuptools.dist, setuptools.command.egg_info
+missing module named pkg_resources.extern.packaging - imported by pkg_resources.extern, pkg_resources
 missing module named pkg_resources.extern.appdirs - imported by pkg_resources.extern, pkg_resources
 missing module named 'pkg_resources.extern.six.moves' - imported by pkg_resources, pkg_resources._vendor.packaging.requirements
 missing module named pkg_resources.extern.six - imported by pkg_resources.extern, pkg_resources
 missing module named resource - imported by posix, C:\CODE\PYTHON\Game\bomb.py
 missing module named posix - imported by os, C:\CODE\PYTHON\Game\bomb.py
 missing module named _posixsubprocess - imported by subprocess, multiprocessing.util, C:\CODE\PYTHON\Game\bomb.py
-missing module named org - imported by pickle, C:\CODE\PYTHON\Game\bomb.py
+missing module named 'org.python' - imported by pickle, setuptools.sandbox, C:\CODE\PYTHON\Game\bomb.py, xml.sax
 missing module named readline - imported by cmd, code, pdb, C:\CODE\PYTHON\Game\bomb.py
 excluded module named _frozen_importlib - imported by importlib, importlib.abc, C:\CODE\PYTHON\Game\bomb.py
 missing module named _frozen_importlib_external - imported by importlib._bootstrap, importlib, importlib.abc, C:\CODE\PYTHON\Game\bomb.py
@@ -34,11 +34,10 @@ missing module named java - imported by platform, C:\CODE\PYTHON\Game\bomb.py
 missing module named 'java.lang' - imported by platform, C:\CODE\PYTHON\Game\bomb.py, xml.sax._exceptions
 missing module named vms_lib - imported by platform, C:\CODE\PYTHON\Game\bomb.py
 missing module named termios - imported by tty, getpass, C:\CODE\PYTHON\Game\bomb.py
-missing module named urllib.splittag - imported by urllib, setuptools.py26compat
 missing module named grp - imported by shutil, tarfile, pathlib, distutils.archive_util, C:\CODE\PYTHON\Game\bomb.py
 missing module named pwd - imported by posixpath, shutil, tarfile, http.server, webbrowser, pathlib, distutils.util, distutils.archive_util, netrc, getpass, C:\CODE\PYTHON\Game\bomb.py
 missing module named _dummy_threading - imported by dummy_threading, C:\CODE\PYTHON\Game\bomb.py
-missing module named 'org.python' - imported by copy, setuptools.sandbox, C:\CODE\PYTHON\Game\bomb.py, xml.sax
+missing module named org - imported by copy, C:\CODE\PYTHON\Game\bomb.py
 missing module named copy_reg - imported by cStringIO, cPickle, numpy.core, pygame
 missing module named 'pygame._view' - imported by pygame
 missing module named MacOS - imported by pygame.macosx
@@ -59,16 +58,15 @@ missing module named 'numpy_distutils.command' - imported by numpy.f2py.diagnose
 missing module named numpy_distutils - imported by numpy.f2py.diagnose
 missing module named numpy.testing.memusage - imported by numpy.testing, numpy.f2py.f2py_testing
 missing module named numpy.testing.jiffies - imported by numpy.testing, numpy.f2py.f2py_testing
-missing module named setuptools_svn - imported by setuptools.command.egg_info
+missing module named setuptools.extern.packaging - imported by setuptools.extern, setuptools.dist, setuptools.command.egg_info
 missing module named 'setuptools.extern.six' - imported by setuptools, setuptools.extension
-missing module named certifi - imported by setuptools.ssl_support
+missing module named _manylinux - imported by setuptools.pep425tags
 missing module named wincertstore - imported by setuptools.ssl_support
 missing module named 'backports.ssl_match_hostname' - imported by setuptools.ssl_support
 missing module named backports - imported by setuptools.ssl_support
-missing module named urllib2 - imported by setuptools.package_index, numpy.lib._datasource
-missing module named 'pkg_resources.extern.packaging.version' - imported by setuptools.msvc
-missing module named 'setuptools.extern.six.moves' - imported by setuptools.dist, setuptools.command.easy_install, setuptools.sandbox, setuptools.command.setopt, setuptools.package_index, setuptools.ssl_support, setuptools.command.egg_info, setuptools.command.py36compat, setuptools.msvc
-missing module named setuptools.extern.six - imported by setuptools.extern, setuptools.monkey, setuptools.dist, setuptools.depends, setuptools.command.easy_install, setuptools.sandbox, setuptools.package_index, setuptools.command.bdist_egg, setuptools.command.egg_info, setuptools.command.sdist, setuptools.unicode_utils, setuptools.glob, setuptools.command.develop
+missing module named 'setuptools.extern.packaging.version' - imported by setuptools.msvc
+missing module named 'setuptools.extern.six.moves' - imported by setuptools.dist, setuptools.py33compat, setuptools.command.easy_install, setuptools.sandbox, setuptools.command.setopt, setuptools.package_index, setuptools.ssl_support, setuptools.command.egg_info, setuptools.command.py36compat, setuptools.namespaces, setuptools.msvc
+missing module named setuptools.extern.six - imported by setuptools.extern, setuptools.monkey, setuptools.dist, setuptools.py33compat, setuptools.config, setuptools.command.easy_install, setuptools.sandbox, setuptools.py27compat, setuptools.package_index, setuptools.wheel, setuptools.command.egg_info, setuptools.command.sdist, setuptools.command.bdist_egg, setuptools.unicode_utils, setuptools.glob, setuptools.command.develop
 missing module named __svn_version__ - imported by numpy.f2py.__version__
 missing module named numarray - imported by numpy.distutils.system_info
 missing module named Numeric - imported by numpy.distutils.system_info
@@ -110,6 +108,7 @@ missing module named numpy.core.csingle - imported by numpy.core, numpy.linalg.l
 missing module named numpy.core.double - imported by numpy.core, numpy.linalg.linalg
 missing module named numpy.core.single - imported by numpy.core, numpy.linalg.linalg
 missing module named future_builtins - imported by numpy.lib.npyio
+missing module named urllib2 - imported by numpy.lib._datasource
 missing module named urlparse - imported by numpy.lib._datasource
 missing module named numpy.recarray - imported by numpy, numpy.ma.mrecords
 missing module named numpy.dtype - imported by numpy, numpy.ma.mrecords, numpy.ctypeslib

@@ -150,3 +150,52 @@ get_id()            必须返回用户的唯一标识符，使用 Unicode 编码
 16 wtforms 文档
 http://wtforms.readthedocs.io/en/1.0.4/validators.html
 http://wtforms.readthedocs.io/en/stable/validators.html
+
+17 redirect 需要使用url_for
+
+18 flask_bootstrap 慢的问题
+我们可以通过简单的传入一个配置参数来使用本地的Bootstrap资源：
+
+app = Flask(__name__)
+app.config['BOOTSTRAP_SERVE_LOCAL'] = True
+使用其他CDN
+如果你想使用其他CDN资源，那么可以直接在Flask-Bootstrap的源码里修改，找到\venv\Lib\site-packages\flask_bootstrap\__init__.py，在文件末尾，将下面这些文件的地址修改成你想引用的CDN地址即可：
+
+bootstrap = lwrap(
+     WebCDN('//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/%s/' %
+                   BOOTSTRAP_VERSION), local)
+
+jquery = lwrap(
+     WebCDN('//cdnjs.cloudflare.com/ajax/libs/jquery/%s/' %
+                   JQUERY_VERSION), local)
+
+html5shiv = lwrap(
+    WebCDN('//cdnjs.cloudflare.com/ajax/libs/html5shiv/%s/' %
+                   HTML5SHIV_VERSION))
+
+respondjs = lwrap(
+    WebCDN('//cdnjs.cloudflare.com/ajax/libs/respond.js/%s/' %
+                   RESPONDJS_VERSION))
+比如换成http://cdn.bootcss.com提供的资源：
+
+bootstrap = lwrap(
+    WebCDN('//cdn.bootcss.com/bootstrap/%s/' % BOOTSTRAP_VERSION), local)
+
+jquery = lwrap(
+    WebCDN('//cdn.bootcss.com/jquery/%s/' % JQUERY_VERSION), local)
+
+html5shiv = lwrap(
+    WebCDN('//cdn.bootcss.com/html5shiv/%s/' % HTML5SHIV_VERSION))
+
+respondjs = lwrap(
+    WebCDN('//cdn.bootcss.com/respond.js/%s/' % RESPONDJS_VERSION))
+
+Flask-Bootstrap源码：https://github.com/mbr/flask-bootstrap
+
+Bootstrap源码：https://github.com/twbs/bootstrap
+
+Flask-Bootstrap文档：http://pythonhosted.org/Flask-Bootstrap/
+
+Flask-Bootstrap中文文档：http://flask-bootstrap-zh.readthedocs.io/zh/latest/
+
+Bootstrap：http://getbootstrap.com/（官网） 或 Bootstrap中文网

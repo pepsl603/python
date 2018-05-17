@@ -1,11 +1,15 @@
 from datetime import datetime
-from flask import render_template, session, redirect, url_for, flash, request
+from flask import render_template
+# from flask session, redirect, url_for, flash, request
 
 from . import main
-from .forms import NameForm
-from ..models import User
-from .. import db
-from ..email import send_email
+# from .forms import NameForm
+# from ..models import User
+# from .. import db
+# from ..email import send_email
+from ..decorators import permission_required, admin_required
+from ..models import Permission
+from flask_login import login_required
 
 
 # 起始页
@@ -44,6 +48,7 @@ def index():
     #                        known=session.get('known', False), currenttime=datetime.utcnow())
     return render_template('index.html', currenttime=datetime.utcnow())
 
+
 # 首页
 @main.route('/main/<name>/')
 @main.route('/main/')
@@ -67,3 +72,17 @@ def test():
 @main.route('/user')
 def user():
     return render_template('404.html')
+
+
+@main.route('/moderator')
+@login_required
+@permission_required(Permission.MODERATE_COMMENTS)
+def for_moderators_only():
+    return render_template('main.html', message='此页面仅协管员可操作')
+
+
+@main.route('/admin')
+@login_required
+@admin_required(Permission.ADMINISTER)
+def for_admin_only():
+    return render_template('main.html', message="此页面仅管理员可操作")
