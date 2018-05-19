@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}H2D-{{ user.username }}{% endblock %}
+
+{% block page_content %}
+    <div class="page-header">
+{#        <img class="img-rounded profile-thumbnail" src="{{ user.gravatar(size=256) }}">#}
+        <img class="img-rounded profile-thumbnail" src="{{ url_for('main.get_pic', u_id=user.id) }}">
+        <div class="profile-header">
+            <h1>{{ user.username }}</h1>
+            {% if user.name or user.location %}
+            <p>
+                {% if user.name %}{{ user.name }}{% endif %}
+                {% if user.location %}
+                    ，地址是：<a href="http://maps.baidu.com/?q={{ user.location }}">{{ user.location }}</a>
+                {% endif %}
+            </p>
+            {% endif %}
+            {% if current_user.is_administrator() %}
+                <p>发邮件给他：<a href="mailto:{{ user.mail }}">{{ user.mail }}</a></p>
+            {% endif %}
+            {% if user.about_me %}
+                <p>{{ user.about_me }}</p>
+            {% endif %}
+            <p>注册时间：{{ moment(user.recdate).format('L') }}.
+                {% if user.username != current_user.username %}
+                    最近访问:
+                    {% if user.last_seen %}
+                    {{ moment(user.last_seen).fromNow() }}
+                    {% else %}
+                    {{ moment(user.recdate).fromNow() }}
+                    {% endif %}
+                {% endif %}
+            </p>
+            <p>
+                {% if user == current_user %}
+                    <a class="btn btn-default" href="{{ url_for('main.edit_profile') }}">修改资料</a>
+                {% endif %}
+                {% if current_user.is_administrator() %}
+                    <a class="btn btn-danger" href="{{ url_for('main.edit_profile_admin', u_id=user.id) }}">修改资料(管理员）</a>
+                {% endif %}
+            </p>
+        </div>
+    </div>
+{% endblock %}

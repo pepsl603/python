@@ -20,7 +20,9 @@ class RegisterForm(FlaskForm):
     # ^开始  $结束
     password = PasswordField('密码*', validators=[DataRequired(), EqualTo('password2', message='两次输入密码要保持一致')])
     password2 = PasswordField('再次确认*', validators=[InputRequired()])
-    phonenumber = StringField('手机号码')
+    phonenumber = StringField('手机号码', validators=[Regexp('^((13[0-9])|(14[5,7])|(15[0-3,5-9])|'
+                                                         '(17[0,3,5-8])|(18[0-9])|166|198|199|(147))\d{8}$',
+                                                         0, '请输入正确的手机号码')])
     submit = SubmitField('提交')
 
     def validate_email(self, field):

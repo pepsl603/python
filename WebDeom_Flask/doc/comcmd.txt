@@ -1,3 +1,6 @@
+重新安装Pip
+easy_install.exe pip
+
 pip 可以使用如下命令自动生成这个文件
 pip freeze >requirements.txt
 

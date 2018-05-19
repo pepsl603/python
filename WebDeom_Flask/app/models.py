@@ -4,7 +4,9 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin, AnonymousUserMixin
 from . import login_manager
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
-from flask import current_app
+from flask import current_app, request
+import hashlib
+import requests
 
 
 # 关注用户               0b00000001（ 0x01） 关注其他用户
@@ -65,6 +67,15 @@ class User(UserMixin, db.Model):
                 self.role = Role.query.filter_by(name='系统管理员').first()
             else:
                 self.role = Role.query.filter_by(default=True).first()
+        if self.mail is not None and self.avatar_hash is None:
+            self.avatar_hash = hashlib.md5(self.mail.encode('utf-8')).hexdigest()
+        if self.mail is not None and self.user_pic is None:
+            pic_data = requests.get(self.gravatar(256))
+            self.user_pic = pic_data.content
+        if self.mail is not None and self.user_pic_small is None:
+            pic_data_small = requests.get(self.gravatar(18))
+            self.user_pic_small = pic_data_small.content
+
 
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -72,9 +83,16 @@ class User(UserMixin, db.Model):
     psd = db.Column(db.String(128))
     mail = db.Column(db.String(200))
     phonenum = db.Column(db.String(20))
-    recdate = db.Column(db.DateTime, default=datetime.utcnow())
+    recdate = db.Column(db.DateTime(), default=datetime.utcnow)
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
     confirmed = db.Column(db.Boolean, default=False)
+    name = db.Column(db.String(40))
+    location = db.Column(db.String(200))
+    about_me = db.Column(db.Text())
+    last_seen = db.Column(db.DateTime(), default=datetime.utcnow)
+    avatar_hash = db.Column(db.String(32))
+    user_pic = db.Column(db.LargeBinary())
+    user_pic_small = db.Column(db.LargeBinary())
 
     # 初始化用户确认token
     def generate_confirmation_token(self, expiration=3600):
@@ -145,6 +163,24 @@ class User(UserMixin, db.Model):
 
     def is_administrator(self):
         return self.can(Permission.ADMINISTER)
+
+    def ping(self):
+        self.last_seen = datetime.utcnow()
+        db.session.add(self)
+        try:
+            db.session.commit()
+        except:
+            db.session.remove()
+
+    def gravatar(self, size=100, default='identicon', rating='g'):
+        if request.is_secure:
+            url = "https://secure.gravatar.com/avatar"
+        else:
+            url = "http://www.gravatar.com/avatar"
+        hash = self.avatar_hash or hashlib.md5(self.mail.encode('utf-8')).hexdigest()
+        return '{url}/{hash}?s={size}&d={default}&r={rating}'.format(
+            url=url, hash=hash, size=size, default=default, rating=rating
+        )
 
 
 class AnonymousUser(AnonymousUserMixin):

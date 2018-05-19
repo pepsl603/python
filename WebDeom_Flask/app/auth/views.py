@@ -10,6 +10,21 @@ from .. import db
 from ..email import send_email
 
 
+@auth.before_app_request
+def before_request():
+    """
+    如果为验证，则跳转到未验证的引导页
+    :return:
+    """
+    if current_user.is_authenticated:
+        current_user.ping()
+        if not current_user.confirmed \
+                and request.endpoint \
+                and request.endpoint[:5] != 'auth.' \
+                and request.endpoint != 'static':
+            return redirect(url_for('auth.unconfirmed'))
+
+
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
     login_form = LoginForm()
@@ -36,8 +51,9 @@ def register():
             token = user.generate_confirmation_token()
             send_email(user.mail, '注册账号确认', 'auth/email/confirm', user=user, token=token)
             flash('发送了一封确认邮件到你的注册邮箱，请登录邮箱确认！')
-        except Exception:
+        except Exception as ex:
             db.session.rollback()
+            print(ex)
             flash('提交失败，请重新填写提交')
             return render_template('auth/register.html', form=register_form)
         return redirect(url_for('auth.login'))
@@ -72,20 +88,6 @@ def resend_confirmation():
     send_email(current_user.mail, '注册账号确认', 'auth/email/confirm', user=current_user, token=token)
     flash('发送了一封新的确认邮件到你的注册邮箱，请登录邮箱确认！')
     return redirect(url_for('main.index'))
-
-
-@auth.before_app_request
-def before_request():
-    """
-    如果为验证，则跳转到未验证的引导页
-    :return:
-    """
-    if current_user.is_authenticated \
-            and not current_user.confirmed \
-            and request.endpoint \
-            and request.endpoint[:5] != 'auth.' \
-            and request.endpoint != 'static':
-        return redirect(url_for('auth.unconfirmed'))
 
 
 @auth.route('/unconfirmed')
