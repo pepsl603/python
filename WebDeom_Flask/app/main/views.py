@@ -2,8 +2,8 @@ from datetime import datetime
 from flask import render_template
 from flask import url_for, flash, redirect
 from . import main
-from ..models import User, Role
-from .forms import EditProfileForm, EditProfileAdminForm
+from ..models import User, Role, Post
+from .forms import EditProfileForm, EditProfileAdminForm, PostForm
 from .. import db
 from ..decorators import permission_required, admin_required
 from ..models import Permission
@@ -22,10 +22,22 @@ def index():
 
 
 # 首页
-@main.route('/main/<name>/')
-@main.route('/main/')
-def _main(name=''):
-    return render_template('main.html', name=name)
+@main.route('/home/', methods=['GET', 'POST'])
+@login_required
+def home():
+    form = PostForm()
+    if current_user.can(Permission.WRITE_ARTICLES) and form.validate_on_submit():
+        post = Post(body=form.body.data,
+                    author=current_user._get_current_object())
+        try:
+            db.session.add(post)
+            db.session.commit()
+            return redirect(url_for('main.home'))
+        except Exception as ex:
+            db.session.rollback()
+            flash('提交失败')
+    posts = Post.query.order_by(Post.timestap.desc()).all()
+    return render_template('home.html', form=form, posts=posts)
 
 
 # 测试页面
@@ -36,9 +48,11 @@ def test():
 
 # 用户资料查询页面
 @main.route('/user/<username>')
+@login_required
 def user(username):
     user = User.query.filter_by(username=username).first_or_404()
-    return render_template('user.html', user=user, base64=base64)
+    posts = user.posts.order_by(Post.timestap.desc()).all()
+    return render_template('user.html', user=user, posts=posts)
 
 
 @main.route('/get_pic/<int:u_id>', methods=['GET', 'POST'])
@@ -72,6 +86,23 @@ def get_pic_small(u_id):
             print(ex)
             db.session.rollback()
     return send_file(io.BytesIO(user.user_pic_small), mimetype='image/png')
+
+
+@main.route('/get_pic_list/<int:u_id>', methods=['GET', 'POST'])
+@login_required
+def get_pic_list(u_id):
+    # base64.b64encode
+    user = User.query.get_or_404(u_id)
+    if user.user_pic_40 is None:
+        pic_data_40 = requests.get(user.gravatar(40))
+        user.user_pic_40 = pic_data_40.content
+        try:
+            db.session.add(user)
+            db.session.commit()
+        except Exception as ex:
+            print(ex)
+            db.session.rollback()
+    return send_file(io.BytesIO(user.user_pic_40), mimetype='image/png')
 
 
 @main.route('/edit-profile', methods=['GET', 'POST'])
@@ -137,11 +168,11 @@ def edit_profile_admin(u_id):
 @login_required
 @permission_required(Permission.MODERATE_COMMENTS)
 def for_moderators_only():
-    return render_template('main.html', message='此页面仅协管员可操作')
+    return render_template('index.html', message='此页面仅协管员可操作')
 
 
 @main.route('/admin')
 @login_required
 @admin_required
 def for_admin_only():
-    return render_template('main.html', message="此页面仅管理员可操作")
+    return render_template('index.html', message="此页面仅管理员可操作")

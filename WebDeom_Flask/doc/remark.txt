@@ -199,3 +199,17 @@ Flask-Bootstrap文档：http://pythonhosted.org/Flask-Bootstrap/
 Flask-Bootstrap中文文档：http://flask-bootstrap-zh.readthedocs.io/zh/latest/
 
 Bootstrap：http://getbootstrap.com/（官网） 或 Bootstrap中文网
+
+
+19, Flask-SQLAlchemy分页对象的属性
+属　　性       说　　明
+items       当前页面中的记录
+query       分页的源查询
+page        当前页数
+prev_num    上一页的页数
+next_num    下一页的页数
+has_next    如果有下一页，返回 True
+has_prev    如果有上一页，返回 True
+pages       查询得到的总页数
+per_page    每页显示的记录数量
+total       查询返回的记录总数

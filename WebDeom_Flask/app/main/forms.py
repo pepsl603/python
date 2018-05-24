@@ -49,3 +49,8 @@ class EditProfileAdminForm(FlaskForm):
         if field.data != self.user.username and \
                 User.query.filter_by(username=field.data).first():
             raise ValidationError('用户名(%s)已被他人使用' % field.data)
+
+
+class PostForm(FlaskForm):
+    body = TextAreaField("说点什么吧。。。", validators=[DataRequired()])
+    submit = SubmitField('提交')

@@ -75,6 +75,9 @@ class User(UserMixin, db.Model):
         if self.mail is not None and self.user_pic_small is None:
             pic_data_small = requests.get(self.gravatar(18))
             self.user_pic_small = pic_data_small.content
+        if self.mail is not None and self.user_pic_40 is None:
+            pic_data_40 = requests.get(self.gravatar(40))
+            self.user_pic_40 = pic_data_40.content
 
 
     __tablename__ = 'users'
@@ -93,6 +96,8 @@ class User(UserMixin, db.Model):
     avatar_hash = db.Column(db.String(32))
     user_pic = db.Column(db.LargeBinary())
     user_pic_small = db.Column(db.LargeBinary())
+    user_pic_40 = db.Column(db.LargeBinary())
+    posts = db.relationship('Post', backref='author', lazy='dynamic')
 
     # 初始化用户确认token
     def generate_confirmation_token(self, expiration=3600):
@@ -181,6 +186,14 @@ class User(UserMixin, db.Model):
         return '{url}/{hash}?s={size}&d={default}&r={rating}'.format(
             url=url, hash=hash, size=size, default=default, rating=rating
         )
+
+
+class Post(db.Model):
+    __tablename__ = 'posts'
+    id = db.Column(db.Integer, primary_key=True)
+    body = db.Column(db.Text)
+    timestap = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
 
 class AnonymousUser(AnonymousUserMixin):
