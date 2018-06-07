@@ -1,5 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, PasswordField, TextAreaField, BooleanField, SelectField
+from flask_pagedown.fields import PageDownField
 from wtforms import ValidationError
 from wtforms.validators import DataRequired, Email, Length, Regexp
 from ..models import Role, User
@@ -52,5 +53,12 @@ class EditProfileAdminForm(FlaskForm):
 
 
 class PostForm(FlaskForm):
-    body = TextAreaField("说点什么吧。。。", validators=[DataRequired()])
+    # body = TextAreaField("说点什么吧。。。(支持Markdown语法）", validators=[DataRequired()])
+    body = PageDownField("说点什么吧。。。", validators=[DataRequired()])
     submit = SubmitField('提交')
+
+
+class CommentForm(FlaskForm):
+    body = StringField('', validators=[DataRequired()])
+    submit = SubmitField('提交')
+

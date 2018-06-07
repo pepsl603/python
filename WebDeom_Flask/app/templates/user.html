@@ -1,5 +1,8 @@
 {% extends "base.html" %}
 
+{% import "_macros.html" as macros %}
+
+
 {% block title %}H2D-{{ user.username }}{% endblock %}
 
 {% block page_content %}
@@ -32,6 +35,21 @@
                     {% endif %}
                 {% endif %}
             </p>
+            <p>发表了 {{ user.posts.count() }} 篇动态</p>
+            <p>
+                {% if user != current_user and current_user.can(Permission.FOLLOW) %}
+                    {% if not current_user.is_following(user) %}
+                        <a href="{{ url_for('main.follow', username=user.username) }}" class="btn btn-primary">关注</a>
+                    {% else %}
+                        <a href="{{ url_for('main.unfollow', username=user.username) }}" class="btn btn-default">取消关注</a>
+                    {% endif %}
+                {% endif %}
+                <a href="{{ url_for('main.followers', username=user.username) }}">粉丝：<span class="badge">{{ user.followers.count() }}</span></a>
+                <a href="{{ url_for('main.followed_by', username=user.username) }}">关注 <span class="badge">{{ user.followed.count() }}</span></a>
+                {% if user != current_user and user.is_following(current_user) %}
+                    | <span class="label label-default">他关注了你</span>
+                {% endif %}
+            </p>
             <p>
                 {% if user == current_user %}
                     <a class="btn btn-default" href="{{ url_for('main.edit_profile') }}">修改资料</a>
@@ -44,4 +62,9 @@
     </div>
     <h3>{{ user.username }} 发表的动态：</h3>
     {% include '_post.html' %}
+    {% if pagination %}
+        <div class="pagination">
+            {{ macros.pagination_widget(pagination,'main.user', username=user.username) }}
+        </div>
+    {% endif %}
 {% endblock %}

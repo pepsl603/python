@@ -2,7 +2,7 @@
 easy_install.exe pip
 
 pip 可以使用如下命令自动生成这个文件
-pip freeze >requirements.txt
+pip freeze >common.txt
 
 如果你要创建这个虚拟环境的完全副本，可以创建一个新的虚拟环境，并在其上运行以下
 命令：

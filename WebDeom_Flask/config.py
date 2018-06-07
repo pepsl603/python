@@ -28,6 +28,8 @@ class Config:
     # 使用本地的Bootstrap资源
     # BOOTSTRAP_SERVE_LOCAL = True
 
+    H2D_POSTS_PER_PAGE = 15
+
     @staticmethod
     def init_app(app):
         pass

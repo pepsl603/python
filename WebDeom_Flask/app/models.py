@@ -4,9 +4,13 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin, AnonymousUserMixin
 from . import login_manager
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
-from flask import current_app, request
+from flask import current_app, request, url_for
 import hashlib
 import requests
+import bleach
+from markdown import markdown
+from sqlalchemy.exc import DatabaseError
+from app.exceptions import ValidationError
 
 
 # 关注用户               0b00000001（ 0x01） 关注其他用户
@@ -20,6 +24,13 @@ class Permission:
     WRITE_ARTICLES = 0X04
     MODERATE_COMMENTS = 0X08
     ADMINISTER = 0X80
+
+
+class Follow(db.Model):
+    __tablename__ = 'follows'
+    follower_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
+    followed_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
 
 # 匿名        0b00000000（ 0x00） 未登录的用户。在程序中只有阅读权限
@@ -69,6 +80,7 @@ class User(UserMixin, db.Model):
                 self.role = Role.query.filter_by(default=True).first()
         if self.mail is not None and self.avatar_hash is None:
             self.avatar_hash = hashlib.md5(self.mail.encode('utf-8')).hexdigest()
+        # print(datetime.now())
         if self.mail is not None and self.user_pic is None:
             pic_data = requests.get(self.gravatar(256))
             self.user_pic = pic_data.content
@@ -78,7 +90,7 @@ class User(UserMixin, db.Model):
         if self.mail is not None and self.user_pic_40 is None:
             pic_data_40 = requests.get(self.gravatar(40))
             self.user_pic_40 = pic_data_40.content
-
+        # print(datetime.now())
 
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -98,6 +110,18 @@ class User(UserMixin, db.Model):
     user_pic_small = db.Column(db.LargeBinary())
     user_pic_40 = db.Column(db.LargeBinary())
     posts = db.relationship('Post', backref='author', lazy='dynamic')
+    comments = db.relationship('Comment', backref='author', lazy='dynamic')
+
+    followed = db.relationship('Follow', foreign_keys=[Follow.follower_id],
+                               backref=db.backref('follower', lazy='joined'),
+                               lazy='dynamic',
+                               cascade='all, delete-orphan')
+
+    followers = db.relationship("Follow", foreign_keys=[Follow.followed_id],
+                                backref=db.backref('followed', lazy='joined'),
+                                lazy='dynamic',
+                                cascade='all, delete-orphan')
+
 
     # 初始化用户确认token
     def generate_confirmation_token(self, expiration=3600):
@@ -117,7 +141,7 @@ class User(UserMixin, db.Model):
             self.confirmed = True
             db.session.add(self)
             db.session.commit()
-        except:
+        except DatabaseError:
             self.confirmed = False
             db.session.rollback()
             return False
@@ -126,6 +150,20 @@ class User(UserMixin, db.Model):
     def generate_reset_psd_token(self, expiration=3600):
         s = Serializer(current_app.config['SECRET_KEY'], expiration)
         return s.dumps({'reset': self.id}).decode('utf-8')
+
+    def generate_auth_token(self, expiration):
+        s = Serializer(current_app.config['SECRET_KEY'], expiration)
+        return s.dumps({'id': self.id}).decode('utf-8')
+
+    @staticmethod
+    def verify_auth_token(token):
+        s = Serializer(current_app.config['SECRET_KEY'])
+        try:
+            data = s.loads(token.encode('utf-8'))
+        except:
+            return None
+        return User.query.get(data.get('id'))
+
 
     @staticmethod
     def reset_psd(token, new_password):
@@ -142,11 +180,15 @@ class User(UserMixin, db.Model):
             user.password = new_password
             db.session.add(user)
             db.session.commit()
-        except:
+        except DatabaseError:
             db.session.rollback()
             return False
         return True
 
+    @property
+    def followed_posts(self):
+        return Post.query.join(Follow, Follow.followed_id == Post.author_id)\
+            .filter(Follow.follower_id == self.id)
 
     @property
     def password(self):
@@ -187,6 +229,69 @@ class User(UserMixin, db.Model):
             url=url, hash=hash, size=size, default=default, rating=rating
         )
 
+    def is_following(self, user):
+        return self.followed.filter_by(
+            followed_id=user.id).first() is not None
+
+    def is_followed_by(self, user):
+        return self.followers.filter_by(follower_id=user.id).first() is not None
+
+    def follow(self, user):
+        if not self.is_following(user):
+            f = Follow(follower=self, followed=user)
+            db.session.add(f)
+            try:
+                db.session.commit()
+            except DatabaseError:
+                db.session.rollback()
+                return False
+        return True
+
+    def unfollow(self, user):
+        f = self.followed.filter_by(followed_id=user.id).first()
+        if f:
+            db.session.delete(f)
+            try:
+                db.session.commit()
+            except DatabaseError:
+                db.session.rollback()
+                return False
+        return True
+
+    def to_json(self):
+        josn_user = {
+            'url': url_for('api.get_user', id=self.id, _external=True),
+            'usename': self.username,
+            'member_since': self.recdate,
+            'lats_seen': self.last_seen,
+            'posts_url': url_for('api.get_user_posts', id=self.id, _external=True),
+            'followed_posts_url': url_for('api.get_user_followed_posts', id=self.id, _external=True),
+            'post_count': self.posts.count()
+        }
+        return josn_user
+
+    @staticmethod
+    def generate_fake(count=100):
+        from sqlalchemy.exc import IntegrityError
+        from random import seed
+        import forgery_py
+
+        seed()
+        for i in range(count):
+            u = User(mail=forgery_py.internet.email_address(),
+                     username=forgery_py.internet.user_name(),
+                     psd=forgery_py.lorem_ipsum.word(),
+                     confirmed=True,
+                     name=forgery_py.name.full_name(),
+                     location=forgery_py.address.city(),
+                     about_me=forgery_py.lorem_ipsum.sentence(),
+                     recdate=forgery_py.date.date(True))
+            db.session.add(u)
+            try:
+                db.session.commit()
+            except IntegrityError:
+                db.session.rollback()
+
 
 class Post(db.Model):
     __tablename__ = 'posts'
@@ -194,6 +299,96 @@ class Post(db.Model):
     body = db.Column(db.Text)
     timestap = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    body_html = db.Column(db.Text)
+    comments = db.relationship('Comment', backref='post', lazy='dynamic')
+
+    def to_json(self):
+        json_post = {
+            'url': url_for('api.get_post', id=self.id, _external=True),
+            'body': self.body,
+            'body_html': self.body_html,
+            'timestamp': self.timestap,
+            'author_url': url_for('api.get_user', id=self.author_id, _external=True),
+            'comments_url': url_for('api.get_post_comments', id=self.id, _external=True),
+            'comment_count': self.comments.count()
+        }
+        return json_post
+
+    @staticmethod
+    def on_changed_body(target, value, oldvalue, initiator):
+        allowed_tags = ['a', 'abbr', 'acronym', 'b', 'blockquote', 'code', 'br',
+                        'em', 'i', 'li', 'ol', 'pre', 'strong', 'ul',
+                        'h1', 'h2', 'h3', 'p']
+        target.body_html = bleach.linkify(bleach.clean(markdown(value, output_format='html'),
+                                                       tags=allowed_tags, strip=True))
+    @staticmethod
+    def from_json(json_post):
+        body = json_post.get('body')
+        if body is None or body == '':
+            raise ValidationError('post does not have a body.')
+        return Post(body=body)
+
+    @staticmethod
+    def generate_fake(count=100):
+        from random import randint, seed
+        import forgery_py
+        from sqlalchemy.exc import DatabaseError
+
+        seed()
+        user_count = User.query.count()
+        for i in range(count):
+            u = User.query.offset(randint(0, user_count-1)).first()
+            p = Post(body=forgery_py.lorem_ipsum.sentences(randint(1, 3)),
+                     timestap=forgery_py.date.date(True),
+                     author=u)
+            db.session.add(u)
+            try:
+                db.session.commit()
+            except DatabaseError:
+                db.session.rollback()
+
+
+db.event.listen(Post.body, 'set', Post.on_changed_body)
+
+
+class Comment(db.Model):
+    __tablename__ = 'comments'
+    id = db.Column(db.Integer, primary_key=True)
+    body = db.Column(db.Text)
+    body_html = db.Column(db.Text)
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    disabled = db.Column(db.Boolean)
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
+
+    def to_json(self):
+        json_comment = {
+            'url': url_for('api.get_comment', id=self.id, _external=True),
+            'post_url': url_for('api.get_post', id=self.post_id, _external=True),
+            'body': self.body,
+            'body_html': self.body_html,
+            'timestamp': self.timestamp,
+            'author_url': url_for('api.get_user', id=self.author_id, _external=True)
+        }
+        return json_comment
+
+    @staticmethod
+    def from_json(json_comment):
+        body = json_comment.get('body')
+        if body is None or body == '':
+            raise ValidationError('comments does no have a body.')
+        return Comment(body=body)
+
+    @staticmethod
+    def on_changed_body(target, value, oldvalue, initiator):
+        allowed_tags = ['a', 'abbr', 'acronym', 'b', 'code', 'em', 'i',
+                        'strong']
+        target.body_html = bleach.linkify(bleach.clean(
+            markdown(value, output_format='html'),
+            tags=allowed_tags, strip=True))
+
+
+db.event.listen(Comment.body, 'set', Comment.on_changed_body)
 
 
 class AnonymousUser(AnonymousUserMixin):
