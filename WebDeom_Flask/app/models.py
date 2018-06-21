@@ -11,6 +11,7 @@ import bleach
 from markdown import markdown
 from sqlalchemy.exc import DatabaseError
 from app.exceptions import ValidationError
+from app.tools import createimg_by_name_256, get_image_by_size, get_imgdata
 
 
 # 关注用户               0b00000001（ 0x01） 关注其他用户
@@ -78,18 +79,19 @@ class User(UserMixin, db.Model):
                 self.role = Role.query.filter_by(name='系统管理员').first()
             else:
                 self.role = Role.query.filter_by(default=True).first()
-        if self.mail is not None and self.avatar_hash is None:
-            self.avatar_hash = hashlib.md5(self.mail.encode('utf-8')).hexdigest()
-        # print(datetime.now())
+        # if self.mail is not None and self.avatar_hash is None:
+        #     self.avatar_hash = hashlib.md5(self.mail.encode('utf-8')).hexdigest()
         if self.mail is not None and self.user_pic is None:
-            pic_data = requests.get(self.gravatar(256))
-            self.user_pic = pic_data.content
-        if self.mail is not None and self.user_pic_small is None:
-            pic_data_small = requests.get(self.gravatar(18))
-            self.user_pic_small = pic_data_small.content
-        if self.mail is not None and self.user_pic_40 is None:
-            pic_data_40 = requests.get(self.gravatar(40))
-            self.user_pic_40 = pic_data_40.content
+            self.get_usr_pic()
+        # if self.mail is not None and self.user_pic is None:
+        #     pic_data = requests.get(self.gravatar(256))
+        #     self.user_pic = pic_data.content
+        # if self.mail is not None and self.user_pic_small is None:
+        #     pic_data_small = requests.get(self.gravatar(18))
+        #     self.user_pic_small = pic_data_small.content
+        # if self.mail is not None and self.user_pic_40 is None:
+        #     pic_data_40 = requests.get(self.gravatar(40))
+        #     self.user_pic_40 = pic_data_40.content
         # print(datetime.now())
 
     __tablename__ = 'users'
@@ -228,6 +230,15 @@ class User(UserMixin, db.Model):
         return '{url}/{hash}?s={size}&d={default}&r={rating}'.format(
             url=url, hash=hash, size=size, default=default, rating=rating
         )
+
+    def get_usr_pic(self):
+        str_name = self.username
+        if self.username is None:
+            str_name = self.mail
+        img = createimg_by_name_256(str_name)
+        self.user_pic = get_imgdata(img)
+        self.user_pic_40 = get_imgdata(get_image_by_size(img, 40))
+        self.user_pic_small = get_imgdata(get_image_by_size(img, 18))
 
     def is_following(self, user):
         return self.followed.filter_by(

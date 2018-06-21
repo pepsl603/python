@@ -37,3 +37,6 @@ python -O -m xxx.py
 
 跑测试用例
 python manage.py test
+
+生成测试报告
+python manage.py test --coverage

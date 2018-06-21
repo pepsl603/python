@@ -8,7 +8,10 @@
 {% block page_content %}
     <div class="page-header">
 {#        <img class="img-rounded profile-thumbnail" src="{{ user.gravatar(size=256) }}">#}
-        <img class="img-rounded profile-thumbnail" src="{{ url_for('main.get_pic', u_id=user.id) }}">
+        <a href="{{ url_for('main.get_new_pic', u_id=user.id) }}">
+           <img class="img-rounded profile-thumbnail" src="{{ url_for('main.get_pic', u_id=user.id) }}">
+        </a>
+
         <div class="profile-header">
             <h1>{{ user.username }}</h1>
             {% if user.name or user.location %}
@@ -61,10 +64,12 @@
         </div>
     </div>
     <h3>{{ user.username }} 发表的动态：</h3>
+    {% if posts|length > 0 %}
     {% include '_post.html' %}
     {% if pagination %}
         <div class="pagination">
             {{ macros.pagination_widget(pagination,'main.user', username=user.username) }}
         </div>
+    {% endif %}
     {% endif %}
 {% endblock %}

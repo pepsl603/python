@@ -83,13 +83,28 @@ def user(username):
     return render_template('user.html', user=user, posts=posts, pagination=pagination)
 
 
+@main.route('/get_new_pic/<int:u_id>', methods=['GET', 'POST'])
+@login_required
+def get_new_pic(u_id):
+    user = User.query.get_or_404(u_id)
+    user.get_usr_pic()
+    try:
+        db.session.add(user)
+        db.session.commit()
+    except DatabaseError as ex:
+        print(ex)
+        db.session.rollback()
+    return redirect(url_for('main.user', username=user.username))
+
+
 @main.route('/get_pic/<int:u_id>', methods=['GET', 'POST'])
 @login_required
 def get_pic(u_id):
     user = User.query.get_or_404(u_id)
     if user.user_pic is None:
-        pic_data = requests.get(user.gravatar(256))
-        user.user_pic = pic_data.content
+        # pic_data = requests.get(user.gravatar(256))
+        # user.user_pic = pic_data.content
+        user.get_usr_pic()
         try:
             db.session.add(user)
             db.session.commit()
@@ -105,8 +120,9 @@ def get_pic_small(u_id):
     # base64.b64encode
     user = User.query.get_or_404(u_id)
     if user.user_pic_small is None:
-        pic_data_small = requests.get(user.gravatar(18))
-        user.user_pic_small = pic_data_small.content
+        # pic_data_small = requests.get(user.gravatar(18))
+        # user.user_pic_small = pic_data_small.content
+        user.get_usr_pic()
         try:
             db.session.add(user)
             db.session.commit()
@@ -122,8 +138,9 @@ def get_pic_list(u_id):
     # base64.b64encode
     user = User.query.get_or_404(u_id)
     if user.user_pic_40 is None:
-        pic_data_40 = requests.get(user.gravatar(40))
-        user.user_pic_40 = pic_data_40.content
+        # pic_data_40 = requests.get(user.gravatar(40))
+        # user.user_pic_40 = pic_data_40.content
+        user.get_usr_pic()
         try:
             db.session.add(user)
             db.session.commit()
@@ -379,3 +396,14 @@ def for_moderators_only():
 @admin_required
 def for_admin_only():
     return render_template('index.html', message="此页面仅管理员可操作")
+
+
+@main.route('/shutdown')
+def server_shutdown():
+    if not current_app.testing:
+        abort(404)
+    shutdown = request.environ.get('werkzeug.server.shutdown')
+    if not shutdown:
+        abort(500)
+    shutdown()
+    return 'Shutting down...'

@@ -57,7 +57,6 @@ def register():
             flash('提交失败，请重新填写提交')
             return render_template('auth/register.html', form=register_form)
         return redirect(url_for('auth.login'))
-
     return render_template('auth/register.html', form=register_form)
 
 
